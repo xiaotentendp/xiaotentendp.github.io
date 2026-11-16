@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>李艺腾 · Agent安全与记忆架构</title>
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --border: #2a2a2a;
+    --text: #e8e8e8;
+    --muted: #9a9a9a;
+    --accent: #5eead4;
+    --accent-dim: #134e4a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 72px 24px 96px; }
+
+  .badge {
+    display: inline-block; font-size: 12px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--accent);
+    border: 1px solid var(--accent-dim); border-radius: 999px;
+    padding: 4px 14px; margin-bottom: 24px;
+  }
+  h1 { font-size: clamp(28px, 5vw, 40px); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 12px; }
+  h1 span { color: var(--accent); }
+  .subtitle { font-size: 16px; color: var(--muted); max-width: 600px; margin-bottom: 12px; }
+  .meta { font-size: 13px; color: var(--muted); margin-bottom: 40px; }
+  .meta a { color: var(--accent); text-decoration: none; border-bottom: 1px dashed var(--accent-dim); }
+  .meta a:hover { border-bottom-color: var(--accent); }
+
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 56px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 20px; border-radius: 8px; font-size: 14px;
+    font-weight: 500; text-decoration: none; transition: opacity 0.15s ease;
+  }
+  .btn:hover { opacity: 0.85; }
+  .btn-primary { background: var(--accent); color: #0d0d0d; }
+  .btn-ghost { border: 1px solid var(--border); color: var(--text); }
+
+  section { margin-bottom: 48px; }
+  h2 { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+  .section-desc { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+
+  .project {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 22px; margin-bottom: 12px;
+  }
+  .project-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+  .project-title { font-size: 15px; font-weight: 600; }
+  .project-status { font-size: 11px; color: var(--accent); border: 1px solid var(--accent-dim); border-radius: 999px; padding: 2px 10px; white-space: nowrap; }
+  .project-status.design { color: var(--muted); border-color: var(--border); }
+  .project p { font-size: 13.5px; color: var(--muted); margin-bottom: 12px; }
+  .project-links { display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; }
+  .project-links a { color: var(--accent); text-decoration: none; border-bottom: 1px dashed var(--accent-dim); }
+  .project-links a:hover { border-bottom-color: var(--accent); }
+
+  .framework-note {
+    background: var(--surface); border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0; padding: 14px 18px; margin-bottom: 20px;
+    font-size: 13px; color: var(--muted);
+  }
+
+  footer { border-top: 1px solid var(--border); padding-top: 24px; font-size: 13px; color: var(--muted); }
+  footer a { color: var(--accent); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="badge">Agent 安全与记忆架构</span>
+  <h1>李艺腾<span>.</span></h1>
+  <p class="subtitle">
+    电气工程背景，近半年投入大模型 Agent 应用工程实践。围绕 Agent 自进化框架的三个核心问题——执行安全、记忆可信、进化可控——独立完成两套可运行 PoC，提交两项国家发明专利申请。
+  </p>
+  <p class="meta">
+    <a href="mailto:xiaotentendp@outlook.com">xiaotentendp@outlook.com</a> · 重庆 / 杭州 / 北京
+  </p>
+
+  <div class="actions">
+    <a class="btn btn-primary" href="resume.pdf" target="_blank">下载简历 PDF</a>
+    <a class="btn btn-ghost" href="https://github.com/xiaotentendp" target="_blank" rel="noopener">GitHub</a>
+  </div>
+
+  <section>
+    <h2>核心项目</h2>
+    <p class="section-desc">三个项目共同构成一个 Agent 自进化框架的三个承重模块。跑得稳、记得住、长不歪。</p>
+
+    <div class="framework-note">
+      <strong>框架关系：</strong>项目一保障主体在执行侧的安全与状态可回滚；项目二保障探索所得经验在写入记忆时可信、在衰减时抗噪；项目三定义“主体稳定运行—隔离实例探索—审核后合入”的完整自进化流程。
+    </div>
+
+    <div class="project">
+      <div class="project-head">
+        <span class="project-title">Agent 零信任隔离与状态恢复系统</span>
+        <span class="project-status">PoC 已验证</span>
+      </div>
+      <p>面向物理执行侧，将不可信数据与可信指令在文件系统层强制分离；以动作对象对交集作为确定性熔断判据，不依赖模型自我判断；快照回滚保证越权提案或上下文污染后系统可回到最后一个有效状态。</p>
+      <div class="project-links">
+        <a href="https://xiaotentendp.github.io/LLM-Agent-Zero-Trust-Security/" target="_blank">项目主页</a>
+        <a href="https://www.bilibili.com/video/BV1Q7xR6zEMN" target="_blank">B站演示</a>
+        <span style="color: var(--muted);">专利申请号：202611727087.1</span>
+      </div>
+    </div>
+
+    <div class="project">
+      <div class="project-head">
+        <span class="project-title">Agent 可信经验写入与抗噪衰减架构</span>
+        <span class="project-status">PoC 已验证</span>
+      </div>
+      <p>污点追踪与三重门控：硬污点拦截、软污点降级为候选、干净执行才进主经验。中层仅存指针与摘要，底层日志链式哈希且仅追加，哈希双份存放，中层篡改可被底层锚点发现。失败解耦为自身不安全、任务不匹配与执行失败三类，环境性失败不降权。</p>
+      <div class="project-links">
+        <a href="https://xiaotentendp.github.io/Agent-Memory-MVP/" target="_blank">项目主页</a>
+        <a href="https://www.bilibili.com/video/BV176sW68ESB" target="_blank">B站演示</a>
+        <span style="color: var(--muted);">专利申请号：202611763471.7</span>
+      </div>
+    </div>
+
+    <div class="project">
+      <div class="project-head">
+        <span class="project-title">Agent 隔离探索与记忆对齐架构</span>
+        <span class="project-status design">设计完成 · PoC 推进中</span>
+      </div>
+      <p>提出“主体稳定运行—隔离实例窄域探索—审核后换模型”的自进化流程，将自指修改转化为可审核、可回滚的工程步骤。隔离实例与主体共享顶层配置，中层经验允许限定范围内的差异，底层日志独立；主体保留顶层写入权，实例可提交提案，驳回须记录理由。</p>
+      <div class="project-links">
+        <span style="color: var(--muted);">架构设计完成，PoC 推进中</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>背景</h2>
+    <p class="section-desc">电气工程及其自动化本科（西南大学，2024）。曾主导晶圆清洗设备电气开发，参与大型高温沉积设备硬件电路开发。真实物理环境的高噪声、强干扰与容错要求，形成了对 Agent 安全边界“不可撤回动作优先约束”的判断基础。</p>
+  </section>
+
+  <footer>
+    <p>联系方式：<a href="mailto:xiaotentendp@outlook.com">xiaotentendp@outlook.com</a></p>
+    <p style="margin-top: 6px;">
+      <a href="https://github.com/xiaotentendp" target="_blank">github.com/xiaotentendp</a>
+    </p>
+  </footer>
+
+</div>
+</body>
+</html>
