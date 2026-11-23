@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>李艺腾 · Agent安全与记忆架构</title>
+<meta name="description" content="Agent 安全与记忆架构：两套可运行 PoC，两项发明专利申请。执行安全、记忆可信、经验演进。">
 <style>
   :root {
     --bg: #0d0d0d;
@@ -70,6 +71,16 @@
     font-size: 13px; color: var(--muted);
   }
 
+  details { margin-top: 10px; font-size: 13px; color: var(--muted); }
+  summary { cursor: pointer; color: var(--accent); font-size: 13px; }
+  details .detail-body { margin-top: 10px; padding-left: 14px; border-left: 2px solid var(--border); }
+  details .detail-body p { margin-bottom: 8px; }
+  details .detail-body strong { color: var(--text); }
+
+  .boundary-list { font-size: 13px; color: var(--muted); padding-left: 0; list-style: none; }
+  .boundary-list li { margin-bottom: 7px; }
+  .boundary-list li::before { content: "· "; color: var(--accent); }
+
   footer { border-top: 1px solid var(--border); padding-top: 24px; font-size: 13px; color: var(--muted); }
   footer a { color: var(--accent); text-decoration: none; }
   footer a:hover { text-decoration: underline; }
@@ -81,23 +92,23 @@
   <span class="badge">Agent 安全与记忆架构</span>
   <h1>李艺腾<span>.</span></h1>
   <p class="subtitle">
-    电气工程背景，近半年投入大模型 Agent 应用工程实践。围绕 Agent 自进化框架的三个核心问题——执行安全、记忆可信、进化可控——独立完成两套可运行 PoC，提交两项国家发明专利申请。
+    电气工程背景，近半年投入大模型 Agent 应用工程实践。围绕 Agent 长期运行中“持续演进”带来的三个核心问题——执行安全、记忆可信、经验演进——独立完成两套可运行 PoC，提交两项国家发明专利申请。两套 PoC 合计约两千行 Python，除 HTTP 请求外无第三方依赖，单机可运行。近期完成记忆治理框架的部署形态与信任边界设计推演。
   </p>
   <p class="meta">
-    <a href="mailto:xiaotentendp@outlook.com">xiaotentendp@outlook.com</a> · 重庆 / 杭州 / 北京
+    <a id="mail" href="#" rel="nofollow">加载中…</a> · 重庆 / 杭州 / 北京
   </p>
 
   <div class="actions">
-    <a class="btn btn-primary" href="李艺腾_AI跨界技术人才20261115.pdf" download>下载简历 PDF</a>
+    <a class="btn btn-primary" href="resume.pdf" target="_blank">下载简历 PDF</a>
     <a class="btn btn-ghost" href="https://github.com/xiaotentendp" target="_blank" rel="noopener">GitHub</a>
   </div>
 
   <section>
     <h2>核心项目</h2>
-    <p class="section-desc">三个项目共同构成一个 Agent 自进化框架的三个承重模块。跑得稳、记得住、长不歪。</p>
+    <p class="section-desc">三个项目共同构成一个 Agent 持续演进框架的三个承重模块。跑得稳、记得住、长不歪。</p>
 
     <div class="framework-note">
-      <strong>框架关系：</strong>项目一保障主体在执行侧的安全与状态可回滚；项目二保障探索所得经验在写入记忆时可信、在衰减时抗噪；项目三定义“主体稳定运行—隔离实例探索—审核后合入”的完整自进化流程。
+      <strong>框架关系：</strong>项目一保障主体在执行侧的安全与状态可回滚；项目二保障探索所得经验在写入记忆时可信、在衰减时抗噪；项目三定义"主体稳定运行—隔离实例探索—审核后合入"的完整经验演进流程。
     </div>
 
     <div class="project">
@@ -105,8 +116,18 @@
         <span class="project-title">Agent 零信任隔离与状态恢复系统</span>
         <span class="project-status">PoC 已验证</span>
       </div>
-      <p>面向物理执行侧，将不可信数据与可信指令在文件系统层强制分离；以动作对象对交集作为确定性熔断判据，不依赖模型自我判断；快照回滚保证越权提案或上下文污染后系统可回到最后一个有效状态。</p>
-      <div class="project-links">
+      <p>面向物理执行侧，将不可信数据与可信指令在文件系统层强制分离；以动作白名单、参数区间、任务匹配三项确定性校验作为熔断判据，判定逻辑独立于模型自我评估；对产生外部副作用的动作，另需短期能力令牌，由不在执行环境权限域内的独立代理校验后放行；快照回滚保证越权提案或上下文污染后系统可回到最后一个有效状态。</p>
+      <details>
+        <summary>设计过程（点开看）</summary>
+        <div class="detail-body">
+          <p><strong>问题：</strong>Agent 获得执行权限后，输入过滤和软对齐挡不住自适应注入。模型被诱导一次，代价就是一个不可撤回的物理动作。</p>
+          <p><strong>考虑过的路径：</strong>在模型层加提示词约束、在输入层做关键词过滤、在输出层做语义审核。前两条依赖模型自我判断，第三条误杀率高。</p>
+          <p><strong>最终选择：</strong>把信任根移到模型之外，在文件系统层做双通道隔离，用三项确定性校验做熔断。产生副作用的动作还须取得短期能力令牌，由独立执行代理校验后放行——这一步解决的是"执行环境本身被控制时协议约束失效"的问题。</p>
+          <p><strong>怎么验证的：</strong>本地 Ollama + 3060 12G 跑 PoC，构造多轮注入，看熔断是否触发、快照是否回滚到有效状态。</p>
+          <p><strong>还没做的：</strong>大规模注入样本的自动化评测集，目前是手工红蓝对抗。文件系统层的隔离（namespace、O_NOFOLLOW、只读挂载）目前是概念验证，未在真实容器环境跑通。</p>
+        </div>
+      </details>
+      <div class="project-links" style="margin-top:12px;">
         <a href="https://xiaotentendp.github.io/LLM-Agent-Zero-Trust-Security/" target="_blank">项目主页</a>
         <a href="https://www.bilibili.com/video/BV1Q7xR6zEMN" target="_blank">B站演示</a>
         <span style="color: var(--muted);">专利申请号：202611727087.1</span>
@@ -119,11 +140,26 @@
         <span class="project-status">PoC 已验证</span>
       </div>
       <p>污点追踪与三重门控：硬污点拦截、软污点降级为候选、干净执行才进主经验。中层仅存指针与摘要，底层日志链式哈希且仅追加，哈希双份存放，中层篡改可被底层锚点发现。失败解耦为自身不安全、任务不匹配与执行失败三类，环境性失败不降权。</p>
-      <div class="project-links">
+      <p>九个验证场景全部通过：注入拦截、正常沉淀、环境性失败不降权、动作性失败降权至隔离、经验自身不安全直接隔离、任务不匹配不改状态、污点分级与解除、中层篡改被底层锚发现、注入内容不含判定参数。</p>
+      <details>
+        <summary>设计过程（点开看）</summary>
+        <div class="detail-body">
+          <p><strong>问题：</strong>Agent 从交互积累经验时，有两条被现有 RAG/记忆方案低估的路径：外部输入投毒，把恶意交互写成"成功经验"；失败反馈投毒，用环境噪声反复压低正确经验。</p>
+          <p><strong>考虑过的路径：</strong>在检索端做排序过滤、在写入端做关键词黑名单、只靠人工审核。第一条治标不治本，第二条能被变形绕过，第三条不可持续。</p>
+          <p><strong>最终选择：</strong>把治理提前到写入端。三重门控：来源干净、通过网关、执行成功，三者同时满足才进主经验；被拦下的交互不进学习回路，只进审计日志。失败分三类归因，只有动作性失败降权。</p>
+          <p><strong>还要解决的一个反直觉问题：</strong>如果任何一次网关阻断都等价于"这条经验有问题"，那么攻击者只要构造一次"标签匹配但任务不匹配"的输入，就能让一条正确经验被永久隔离。所以归因里专门留了"任务不匹配"这一类，处置是"不动权重、不动状态"。</p>
+          <p><strong>怎么验证的：</strong>Ollama + SQLite 跑三层记忆 MVP，跑通写入门控、哈希防篡改、失败归因三条主线，含篡改测试。</p>
+          <p><strong>还没做的：</strong>时间冷却恢复的时钟触发、候选经验升格逻辑、实体匹配（演示版实现了子串、近似、片段组合三项）、向量召回与精排。</p>
+        </div>
+      </details>
+      <div class="project-links" style="margin-top:12px;">
         <a href="https://xiaotentendp.github.io/Agent-Memory-MVP/" target="_blank">项目主页</a>
         <a href="https://www.bilibili.com/video/BV176sW68ESB" target="_blank">B站演示</a>
         <span style="color: var(--muted);">专利申请号：202611763471.7</span>
       </div>
+      <p style="margin-top:10px; margin-bottom:0; font-size:12.5px;">
+        另附交互式演示程序：可选择可信／不可信输入通道，逐步显示模型提议、污点检测、网关校验、经验沉淀的完整过程，并可现场执行篡改测试观察哈希锚报警。
+      </p>
     </div>
 
     <div class="project">
@@ -131,25 +167,75 @@
         <span class="project-title">Agent 隔离探索与记忆对齐架构</span>
         <span class="project-status design">设计完成 · PoC 推进中</span>
       </div>
-      <p>提出“主体稳定运行—隔离实例窄域探索—审核后换模型”的自进化流程，将自指修改转化为可审核、可回滚的工程步骤。隔离实例与主体共享顶层配置，中层经验允许限定范围内的差异，底层日志独立；主体保留顶层写入权，实例可提交提案，驳回须记录理由。</p>
-      <div class="project-links">
+      <p>提出"主体稳定运行—隔离实例窄域探索—审核后合入"的演进流程，将自指修改转化为可审核、可回滚的工程步骤。隔离实例与主体共享顶层配置，中层经验允许限定范围内的差异，底层日志独立；主体保留顶层写入权，实例可提交提案，驳回须记录理由。</p>
+      <details>
+        <summary>设计过程（点开看）</summary>
+        <div class="detail-body">
+          <p><strong>问题：</strong>让系统自己改进自己，最大的风险不是改错，是"改错了但没人知道"。运行中直接改自身，风险不可控。</p>
+          <p><strong>考虑过的路径：</strong>在运行中直接改自身（风险不可控）、完全靠人工调（速度跟不上）。</p>
+          <p><strong>最终选择：</strong>把"自改自身"拆成"隔离实例窄域探索—审核—合入"。主体在运行中保持稳定，隔离实例在限定领域试错，探索结果经审核后以配置更新的方式合入，记忆与身份配置不变。顶层写入权在本体，实例只能提交提案，驳回必须记理由。</p>
+          <p><strong>边界：</strong>目前是设计完成，PoC 推进中。验证的是流程可行性，不是性能。</p>
+          <p><strong>说明：</strong>此处的"自演进"指经验与配置层面的演进，不含模型结构或推理流程的自动修改。</p>
+        </div>
+      </details>
+      <div class="project-links" style="margin-top:12px;">
         <span style="color: var(--muted);">架构设计完成，PoC 推进中</span>
       </div>
     </div>
   </section>
 
   <section>
+    <h2>部署形态与信任边界（设计推演）</h2>
+    <p class="section-desc">记忆治理框架该装在哪、谁信谁。这一节是判断，不是实现——无实测数据。</p>
+
+    <div class="project">
+      <p style="margin-bottom:12px;">
+        记忆库可以下沉到客户侧。因为记忆里装的是客户的业务知识——历史决策、故障处理经验、客户偏好，这些是资产。B 端对数据出域的要求往往是硬的（合规、内审、行业监管），这是它必然要留在本地的原因。
+      </p>
+      <p style="margin-bottom:12px;"><strong style="color:var(--text);">但有三样不能下沉：</strong></p>
+      <ul class="boundary-list" style="margin-bottom:12px;">
+        <li><strong style="color:var(--text);">签名权</strong>——留在服务端。客户端只能提交经验包，不能盖章。否则客户端可以签一份内容合法、但里面嵌了坏东西的包。</li>
+        <li><strong style="color:var(--text);">锚</strong>——服务端定期存链头哈希。客户端改了自己的日志，和链头对不上就会被发现。</li>
+        <li><strong style="color:var(--text);">审计最终副本</strong>——留服务端。否则客户端能自证清白，"可审计"这个卖点就失效了。</li>
+      </ul>
+      <p style="margin-bottom:12px;">一句话：<strong style="color:var(--text);">数据主权归客户，信任根归服务方。</strong></p>
+      <p style="margin-bottom:0;"><strong style="color:var(--text);">边界：</strong>token 减少的收益来自三层记忆，不来自下沉客户端；并发分散不等于集群压力消失；客户端运维是真实成本；以上均为设计推演，无实测数据。</p>
+    </div>
+  </section>
+
+  <section>
     <h2>背景</h2>
-    <p class="section-desc">电气工程及其自动化本科（西南大学，2024）。曾主导晶圆清洗设备电气开发，参与大型高温沉积设备硬件电路开发。真实物理环境的高噪声、强干扰与容错要求，形成了对 Agent 安全边界“不可撤回动作优先约束”的判断基础。</p>
+    <p class="section-desc">电气工程及其自动化本科（西南大学，2024）。曾主导晶圆清洗设备电气开发，参与大型高温沉积设备硬件电路开发。真实物理环境的高噪声、强干扰与容错要求，形成了对 Agent 安全边界"不可撤回动作优先约束"的判断基础。</p>
+  </section>
+
+  <section>
+    <h2>当前状态</h2>
+    <p class="section-desc">在职，考虑 Agent / Harness 方向的工程岗位，可接受杭州 / 北京 / 重庆。两个 PoC 可运行，第三份设计完成、PoC 推进中，部署形态与信任边界为设计推演。</p>
   </section>
 
   <footer>
-    <p>联系方式：<a href="mailto:xiaotentendp@outlook.com">xiaotentendp@outlook.com</a></p>
+    <p>联系方式：<a id="mail-footer" href="#" rel="nofollow">加载中…</a></p>
     <p style="margin-top: 6px;">
-      <a href="https://github.com/xiaotentendp" target="_blank">github.com/xiaotentendp</a>
+      <a href="https://github.com/xiaotentendp" target="_blank" rel="noopener">github.com/xiaotentendp</a>
     </p>
   </footer>
 
 </div>
+
+<script>
+  (function () {
+    var u = "xiaotentendp";
+    var d = "outlook.com";
+    var addr = u + "@" + d;
+    ["mail", "mail-footer"].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) {
+        el.href = "mailto:" + addr;
+        el.textContent = addr;
+      }
+    });
+  })();
+</script>
+
 </body>
 </html>
